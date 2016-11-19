@@ -103,18 +103,3 @@ const deleteStoryProcess = (storyId) => {
         });
 
 };
-
-const restoreFromGoogleProcess = () => {
-    StartGoogleDrive()
-        .then(forceAuthGoogleDrive)
-        .then(createAppFolderAsync)
-        .then(restoreFromGoogle)
-        .catch((reason) => {
-            console.log("inside catch, reason: ", reason);
-        });
-
-    const arrayOfStories = [];
-    for (let i = 0; i <= arrayOfStories.length; i++) {
-        upsertAllChaptersFromArray(arrayOfStories[i]);
-    }
-};

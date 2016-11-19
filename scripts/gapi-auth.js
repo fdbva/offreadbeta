@@ -290,7 +290,7 @@ function makeRequestGoogleDrive(downloadUrl, retryCount = maxRequestRetry) {
         console.log(`making request with url: ${downloadUrl}`);
         xhr.open('GET', downloadUrl);
         xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-        xhr.onload = () => {
+        xhr.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 console.log(xhr);
                 const appState = JSON.parse(pako.inflate(xhr.responseText, { to: 'string' }));
@@ -308,7 +308,7 @@ function makeRequestGoogleDrive(downloadUrl, retryCount = maxRequestRetry) {
                 }
             }
         };
-        xhr.onerror = () => {
+        xhr.onerror = function () {
             //retry to download could enter here before rejecting
             if (retryCount) {
                 setTimeout(makeRequest(data, --retryCount), 100);
