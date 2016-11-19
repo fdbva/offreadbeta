@@ -176,9 +176,14 @@ function updateSideBarMenu() {
 
         const storySelector = document.querySelectorAll(".story-sel");
         for (let i = storySelector.length - 1; i >= 0; i--) {
-            storySelector[i].addEventListener("click",
-                function(e) {
+            storySelector[i].addEventListener("click", function(e) {
                     console.log(this);
+                    var chapterDelete = this.children[0];
+                    chapterDelete.addEventListener("click", function(e) {
+                        var storyId = data[e.target.dataset.story].storyId;
+                        console.log('deleting', storyId)
+                        deleteStoryProcess(storyId);
+                    })
                     console.log(this.dataset.story);
                     const s = this.dataset.story;
                     console.log(data[s]);
