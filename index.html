@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Offline Reader</title>
+    <link rel="shortcut icon" href="images/favicon.ico?v2" type="image/x-icon" />
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <section class="loader">
+        <div id="load"></div>
+    </section>
+    <div id="mobile-nav">
+        <div class="nav-toggle">
+            <span></span>
+        </div>
+    </div>
+    <section class="sidebar">
+        <input type="button" id="authorizeButton" style="display: none" value="Authorize" />
+        <button class="btn-scrape" id="btn-restore">Restore from Drive</button>
+        <div class="sidebar-input">
+            <p><input id="input-scrape" type="text" placeholder="Insert a valid Url...." value="https://www.fictionpress.com/s/3296648/1/From-Earth-with-love"></p>
+            <p><button class="btn-scrape" id="btn-scrape">Scrape</button>
+            <button class="btn-scrape" id="btn-scrape-drive">
+                Scrape&<img class="google-drive-icon" src="images/Google-Drive-icon.png">
+            </button></p>
+        </div>
+        <div class="sidebar-list"></div>
+        <nav class="nav">
+            <div class="home-btn">Home</div>
+            <div class="about-btn">About</div>
+        </nav>
+    </section>
+    <section class="reader">
+        <div class="home">
+            <br>
+            <h1>Welcome to OffRead!</h1>
+            <br>
+            <h2>Here you can go offroad and keep reading on the browser, here how it's done:</h2>
+            <br>
+            <p>   1 - Copy a story link from a supported site</p>
+            <p>   2 - Paste it in the input on our side bar menu</p>
+            <p>   3 - Click Scrape if you only want to save it on your device</p>
+            <br>
+            <p><strong>Done!</strong> You can start reading as soon as it loads.</p>
+            <br>
+            <p>Optionally, you can also click on the Scrape+{googleDriveIcon} to save it in the cloud.</p>
+            <br>
+            <h2>For now, these are our supported sites:</h2>
+            <p>www.fictionpress.com</p>
+            <p>www.fanfiction.net</p>
+            <br><br>
+        </div>
+        <div class="about">
+            <h2>Offroad - The Project:</h2>
+            <br>
+            <p>This webapp was made as a final year project.</p>
+            <br>
+            <p>It was a team effort and the authors are:</p>
+            <br>
+            <a href="https://github.com/fdbva">Felipe Villela</a>
+            <br>
+            <a href="https://github.com/jcn13">João Coelho Neto</a>
+            <br>
+            <a href="https://github.com/raphamorim">Raphael Amorim</a>
+            <br>
+            <br>
+            <br>
+            <h3>Main technologies used:</h3>
+            <br>
+            <p> - IndexedDb</p>
+            <p> - Yahoo Query Language</p>
+            <p> - Service Worker</p>
+            <p> - Google Drive</p>
+            <p> - Bluebird</p>
+        </div>
+        <div class="offreader">
+            <div class="title" id="title">
+                . . .
+            </div>
+            <div class="description">
+                <p>Chapters: <span id="chapters-total">0</span></p>
+            </div>
+            <div class="navigation">
+                <select id="chapters-select" class="chapters-select chapters" title="Chapter Navigation" name="chapter"></select>
+                <a class="btn prev disable" type="button">< Prev</a>
+                <a class="btn next" type="button">Next &gt;</a>
+            </div>
+            <div class="text" id="storyList"></div>
+            <div class="footer">
+                <div class="navigation">
+                    <select id="chapters-select" class="chapters-select chapters" title="Chapter Navigation" name="chapter"></select>
+                    <a class="btn prev disable" type="button">< Prev</a>
+                    <a class="btn next" type="button">Next &gt;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="scripts/bluebird.js"></script>
+    <script src="scripts/pako.js"></script>
+    <script src="scripts/pace.js"></script>
+    <script src="scripts/globals.js"></script>
+    <script src="scripts/userInterface.js"></script>
+    <script src="scripts/gapi-auth.js"></script>
+    <!--<script type="text/javascript" src="https://apis.google.com/js/client.js"></script><!--?onload=handleClientLoad"></script>-->
+    <script src="scripts/Scraping.js"></script>
+    <script src="scripts/IndexedDb.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
