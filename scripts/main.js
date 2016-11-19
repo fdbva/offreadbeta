@@ -11,10 +11,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
         .catch((reason) => {
             console.log("DOMContentLoaded catch, reason: ", reason);
         })
-    .then(() => {
-        console.groupEnd("pageStart");
-        window.performance.clearMarks();
-    });
+        .then(() => {
+            console.groupEnd("pageStart");
+            window.performance.clearMarks();
+        })
+        .finally(() => {
+           enableButtons();
+        });
 });
 //btnScrape.addEventListener("click", StartScrap);
 aboutbtn.addEventListener("click", displayScreen.bind(this, "about"));
@@ -42,7 +45,10 @@ btnScrape.addEventListener("click",
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance);
+        .then(reportPerformance)
+        .finally(() => {
+            enableButtons();
+        });;
     });
 btnScrapeAndDrive.addEventListener("click",
     () => {
@@ -62,7 +68,10 @@ btnScrapeAndDrive.addEventListener("click",
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance);
+        .then(reportPerformance)
+        .finally(() => {
+            enableButtons();
+        });;
     });
 
 btnRestore.addEventListener("click",
@@ -74,19 +83,36 @@ btnRestore.addEventListener("click",
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance);
+        .then(reportPerformance)
+        .finally(() => {
+            enableButtons();
+        });;
     });
-const deleteStoryProcess = (storyId) => {
-    deleteStoryDb(storyId);
 
-}
+const deleteStoryProcess = (storyId) => {
+    console.log("enter deleteStoryProcess", storyId);
+    globalDeleteStoryId = storyId;
+    deleteStoryDb(storyId);
+    StartGoogleDrive()
+        .then(checkAuthGoogleDrive)
+        .then(deleteStoryGd)
+        .catch((reason) => {
+            console.log("inside catch, reason: ", reason);
+        });
+
+};
+
 const restoreFromGoogleProcess = () => {
-    restoreFromGoogle();
-    // flatten resp in arrays of Chapters grouped from same story
-    const story1array = [];
-    const story2array = [story1array, story2array];
+    StartGoogleDrive()
+        .then(forceAuthGoogleDrive)
+        .then(createAppFolderAsync)
+        .then(restoreFromGoogle)
+        .catch((reason) => {
+            console.log("inside catch, reason: ", reason);
+        });
+
     const arrayOfStories = [];
-    //loop arrayOfStories
-    let i = 0;
-    upsertAllChaptersFromArray(arrayOfStories[i]);
-}
+    for (let i = 0; i <= arrayOfStories.length; i++) {
+        upsertAllChaptersFromArray(arrayOfStories[i]);
+    }
+};

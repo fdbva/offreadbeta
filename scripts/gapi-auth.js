@@ -5,6 +5,7 @@
 
 const StartGoogleDrive = () => {
     const promise = new Promise((resolve, reject) => {
+        disableButtons();
         console.groupCollapsed("Google Drive");
         console.log("StartGoogleDrive");
         window.performance.mark('startStartGoogleDriveToCreateAppFolder');
@@ -209,12 +210,22 @@ function deleteFileById(fileId) {
     return promise;
 };
 
-function deleteStoryGd(storyId) {
+function deleteStoryGd() {
+    console.log("enter deleteStoryGd", globalDeleteStoryId);
     const promise = new Promise((resolve, reject) => {
-
+        const request = gapi.client.drive.files.list(
+            {
+                'q': "mimeType = 'application/json' and title = '" + globalDeleteStoryId + "' and trashed = false"
+            });
+        request.execute((resp) => {
+            const files = resp.items;
+            console.log(resp);                
+            deleteFileById(files[0].id)
+            .then((resp)=>{resolve();});
+        });
     });
     return promise;
-}
+};
 
 function restoreFromGoogle() {
     const promise = new Promise((resolve, reject) => {
@@ -281,8 +292,10 @@ function makeRequestGoogleDrive(downloadUrl, retryCount = maxRequestRetry) {
         xhr.onload = () => {
             if (this.status >= 200 && this.status < 300) {
                 console.log(xhr);
-                appState = JSON.parse(xhr.responseText);
-                resolve(appState);
+                const appState = JSON.parse(pako.inflate(xhr.responseText, { to: 'string' }));
+                console.log(appState);
+                that.chaptersArray = appState;
+                upsertAllChaptersFromArray(appState);
             } else {
                 if (retryCount) {
                     setTimeout(makeRequest(data, --retryCount), 100);

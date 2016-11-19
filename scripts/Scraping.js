@@ -8,6 +8,7 @@ function ScrapeButtonStarter() {
     console.groupCollapsed("ScrapeButtonStarter");
     that.scrape.length = 0;
     that.chaptersArray.length = 0;
+    disableButtons();
     const promise = new Promise((resolve, reject) => {
         parseUserInput(inputScrape.value, supportedSites);
         that.scrape.yqlGetChapterLinks = yqlStringBuilder(that.scrape.parsedInput.href,
@@ -29,7 +30,7 @@ const getStoryInfo = function(data) {
     console.groupCollapsed("getStoryInfo");
     window.performance.mark('startGetStoryInfo');
     return new Promise((resolve, reject) => {
-        resolve(makeRequest(data));
+        resolve(makeRequestWithRetry(data), 8, 10);
     });
 };
 
@@ -37,6 +38,9 @@ const parseStoryInfo = (response) => {
     window.performance.mark('endGetStoryInfo');
     window.performance.mark('startParseStoryInfo');
     const promise = new Promise((resolve, reject) => {
+        console.log("parseStoryInfo response: ",response);
+        console.log("parseStoryInfo resolve: ",resolve);
+        console.log("parseStoryInfo reject: ",reject);
         const totalOfChapters = (JSON.parse(response)).query.results.select[0].option.length;
         if (totalOfChapters <= 0) {
             reject();
@@ -89,7 +93,7 @@ const getAllChapters = (data) => {
         const k = that.scrape.chapterLinksList.length;
         let j = 0;
         return Promise.map(that.scrape.chapterLinksList, (response, i) => {
-            return makeRequest(that.scrape.chapterLinksList[i])
+            return makeRequestWithRetry(that.scrape.chapterLinksList[i], 8, 10)
                 .then((response) => {
                     const storyObj = {
                         chapterId: that.scrape.parsedInput.storyId + "." + (i + 1),
@@ -185,7 +189,7 @@ function yqlStringBuilder(parsedUrl, xpath, format = "json") {
     const getFirstChapter = (data) => {
         const promise = new Promise((resolve, reject) => {
             console.log("getFirstChapter beforebegin, link: ", that.scrape.chapterLinksList[0]);
-            return makeRequest(that.scrape.chapterLinksList[0])
+            return makeRequestWithRetry(that.scrape.chapterLinksList[0], 8, 10)
                 .then((response) => {
                     console.log("getFirstChapter makerequest.then, response: ", response != null);
                     storyObj = {

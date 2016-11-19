@@ -41,6 +41,7 @@ that.chapterObject = {
     storyContent: null
 };
 that.retryCount = [];
+const maxRetryInterval = 8000;
 const maxRequestRetry = 5;
 that.chaptersArray = [];
 that.storyInfo = {
@@ -75,6 +76,7 @@ let id = null;
 let idOff = null;
 let globalAppFolderGoogleId = null;
 let globalStoryFolderGoogleId = null;
+let globalDeleteStoryId = null;
 let idStory = undefined;
 let storyName = undefined;
 that.driveItems = [];
@@ -102,7 +104,7 @@ const supportedSites = new Map([
     }]
 ]);
 
-const reportPerformance = function() {
+const reportPerformance = function () {
     const promise = new Promise((resolve, reject) => {
         window.performance.mark("endWholeProcess");
         console.groupCollapsed("Performance report...");
@@ -130,38 +132,72 @@ const reportPerformance = function() {
     });
     return promise;
 };
-
-function makeRequest(data, retryCount = maxRequestRetry) {
+function makeRequestWithRetry2(otherArgs, retryInterval, maxRetries, promise) { //TODO: consertar!
+    const promiseBase = new Promise((resolve, reject) => {
+        promise = promise || new Promise((r) => {resolve(r)}, (e)=>{reject(e)});
+        console.log("makeRequestWithRetry beforeRequest: ", otherArgs);
+        makeRequest(otherArgs)
+            .then((resp) => { console.log("makeRequestWithRetry resp: ", resp); promise.resolve(resp); })
+            .catch((error) => {
+                console.log("makeRequestWithRetry error: ", error);
+                if (maxRetries > 0) {
+                    setTimeout(function () {
+                        // Try again with incremental backoff, 2 can be
+                        // anything you want.  You could even pass it in.
+                        // Cap max retry interval, which probably makes sense
+                        // in most cases.
+                        makeRequestWithRetry(otherArgs, Math.min(maxRetryInterval, retryInterval * 2), maxRetries - 1, promise);
+                    },
+                        retryInterval);
+                } else {
+                    promise.reject(error);
+                }
+            });
+    });
+    return promiseBase;
+}
+function makeRequestWithRetry(data) {
     return new Promise((resolve, reject) => {
         if (!data || !data.url) reject();
         const xhr = new XMLHttpRequest();
         xhr.open(data.method, data.url);
-        xhr.onload = function()  {
+        xhr.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 resolve(xhr.response);
-            } else {
-                if (retryCount) {
-                    setTimeout(makeRequest(data, --retryCount), 100);
-                } else {
-                    console.error("makeRequest exceeded max of tries, status: ", this.status);
-                    reject({
-                        status: this.status,
-                        statusText: xhr.statusText
-                    });
-                }
             }
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
         };
-        xhr.onerror = function() {
-            console.log("...");
-            if (retryCount) {
-                setTimeout(makeRequest(data, --retryCount), 100);
-            } else {
-                console.error("makeRequest exceeded max of tries (onerror), status: ", this.status);
-                reject({
-                    status: this.status,
-                    statusText: xhr.statusText
-                });
+        xhr.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+        xhr.send();
+    });
+};
+function makeRequest(data) {
+    return new Promise((resolve, reject) => {
+        if (!data || !data.url) reject();
+        const xhr = new XMLHttpRequest();
+        xhr.open(data.method, data.url);
+        xhr.onload = function () {
+            if (this.status >= 200 && this.status < 300) {
+                resolve(xhr.response);
             }
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
+        };
+        xhr.onerror = function () {
+            reject({
+                status: this.status,
+                statusText: xhr.statusText
+            });
         };
         xhr.send();
     });

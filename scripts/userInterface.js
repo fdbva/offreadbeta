@@ -19,6 +19,25 @@ function displayScreen(currentDisplay) {
         offreader.style.display = "block";
 }
 
+function disableButtons() {
+    btnScrape.disabled = true;
+    btnScrapeAndDrive.disabled = true;
+    btnRestore.disabled = true;
+    //const btns = document.getElementsByClassName("angka"); //change to delete story class button
+    //for (let i = 0; i < elems.length; i++) {
+    //    btns[i].disabled = true;
+    //}
+};
+function enableButtons() {
+    btnScrape.disabled = false;
+    btnScrapeAndDrive.disabled = false;
+    btnRestore.disabled = false;
+    //const btns = document.getElementsByClassName("angka"); //change to delete story class button
+    //for (let i = 0; i < elems.length; i++) {
+    //    btns[i].disabled = true;
+    //}
+};
+
 function toggleSideBar() {
     const sidebar = document.querySelector(".sidebar");
     const navToggle = document.querySelector(".nav-toggle");

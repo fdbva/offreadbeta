@@ -186,7 +186,7 @@ const upsertAllChaptersFromArray = (objArray) => {
                 ++i;
             } else {
                 console.groupCollapsed("IndexedDb");
-                console.log(`All ${that.scrape.parsedInput.storyName} chapters saved on IndexedDb`);
+                console.log(`All ${objArray[0].storyName} chapters saved on IndexedDb`);
                 console.groupEnd("IndexedDb");
                 window.performance.mark('endUpsertAllChaptersFromArray');
                 resolve(objArray);
