@@ -17,7 +17,7 @@ function displayScreen(currentDisplay) {
         home.style.display = "block";
     else {
         offreader.style.display = "block";
-        setTimeout(function(){
+        setTimeout(function() {
             getCurrentChapter();
         }, 1000);
     }
@@ -32,6 +32,7 @@ function disableButtons() {
     //    btns[i].disabled = true;
     //}
 };
+
 function enableButtons() {
     btnScrape.disabled = false;
     btnScrapeAndDrive.disabled = false;
@@ -52,7 +53,7 @@ function toggleSideBar() {
 }
 
 function populateSelectOptions() {
-    const promise = new Promise(function (resolve, reject) {
+    const promise = new Promise(function(resolve, reject) {
         const select = document.querySelectorAll(".chapters-select");
 
         select[0].innerHTML = "";
@@ -168,6 +169,7 @@ function updateSideBarMenu() {
             strList.insertAdjacentHTML("beforeend",
                 `
         <a href="#" class="sidebar-list--item story-sel" data-story="${i}" title="${obj.storyName}">
+            <div class="sidebar-list--delete-item" data-story="${i}"></div>
             <span class="sidebar-list--text">${obj.storyName} - ${obj.totalOfChapters} chapters</span>
         </a>`);
         });
