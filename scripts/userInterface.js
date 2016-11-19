@@ -36,8 +36,8 @@ function populateChaptersSelectOptions() {
         optionHtml.appendChild(new Option(`Chapter: ${i}`, i));
     }
     chaptersSelect.appendChild(optionHtml);
-    chaptersSelect.addEventListener("change", () => {
-        goToChapter(this.value);
+    chaptersSelect.addEventListener("change", function () {
+        goToChapter(this.value); //RAPHAEL, quando vc faz isso, vc passa uma string, e depois vc tenta somar como se fosse número
     });
 }
 
@@ -69,13 +69,17 @@ function closeMobileSidebar() {
 }
 
 function goToChapter(chapter) {
-    Story.currentChapter = chapter;
+    Story.currentChapter = Number.parseInt(chapter);
     updateNav();
     getCurrentChapter();
 }
 
 function getCurrentChapter() {
+    if (!Number.isInteger(Story.currentChapter)) {
+        console.error("It's not a FUCKING NUMBER!");
+    }
     const nextStoryPath = Story.id + "." + Story.currentChapter;
+    console.log("getCurrentChapter", nextStoryPath);
     getChapter(nextStoryPath);
 }
 
@@ -131,19 +135,20 @@ function updateSideBarMenu() {
         data.forEach((obj, i) => {
             strList.insertAdjacentHTML("beforeend",
                 `
-        <a href="#" class="sidebar-list--item story-sel" data-story="${i}" title="${obj.StoryName}">
-            <span class="sidebar-list--text">${obj.StoryName} - ${obj.TotalOfChapters} chapters</span>
+        <a href="#" class="sidebar-list--item story-sel" data-story="${i}" title="${obj.storyName}">
+            <span class="sidebar-list--text">${obj.storyName} - ${obj.totalOfChapters} chapters</span>
         </a>`);
         });
 
         const storySelector = document.querySelectorAll(".story-sel");
         for (let i = storySelector.length - 1; i >= 0; i--) {
             storySelector[i].addEventListener("click",
-                (e) => {
+                function(e) {
+                    console.log(this);
                     console.log(this.dataset.story);
                     const s = this.dataset.story;
                     console.log(data[s]);
-                    Story.name = data[s].StoryName;
+                    Story.name = data[s].storyName;
                     Story.id = data[s].chapterId.split(".")[0];
                     Story.chapters = data[s].totalOfChapters;
                     chaptersTotal.textContent = Story.chapters;

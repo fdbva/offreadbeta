@@ -119,20 +119,20 @@ function getListOfStoriesInDb() {
         const myArray = [];
         const storySet = new Set();
         const request = objectStore.openCursor();
-        request.onsuccess = () => {
+        request.onsuccess = function () {
             const cursor = this.result;
             if (!cursor) return;
-            if (!storySet.has(cursor.value.StoryName)) {
+            if (!storySet.has(cursor.value.storyName)) {
                 myArray.push(cursor.value);
-                storySet.add(cursor.value.StoryName);
+                storySet.add(cursor.value.storyName);
             }
             cursor.continue();
         };
-        request.onerror = (error) => {
+        request.onerror = function (error) {
             console.log("getListOfStoriesInDb onerror: ", error);
             reject(error);
         };
-        transaction.oncomplete = () => {
+        transaction.oncomplete = function () {
             that.sidebarMenu = (myArray);
             window.performance.mark('endGetListOfStoriesInDb');
             resolve(myArray);
