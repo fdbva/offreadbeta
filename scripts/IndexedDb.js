@@ -38,7 +38,6 @@ function openDb() {
             store.createIndex("chapterId", "chapterId", { unique: true });
             store.createIndex("storyId", "storyId", { unique: false });
             //}
-
         };
     });
     return promise;
@@ -70,6 +69,7 @@ function testDb() {
 * @param {string} storeName
 * @param {string} mode either "readonly" or "readwrite"
 */
+
 function getObjectStore(storeName, mode) {
     const tx = db.transaction(storeName, mode);
     return tx.objectStore(storeName);
@@ -119,6 +119,7 @@ function getListOfStoriesInDb() {
         const myArray = [];
         const storySet = new Set();
         const request = objectStore.openCursor();
+
         request.onsuccess = function () {
             const cursor = this.result;
             if (!cursor) return;

@@ -1,4 +1,3 @@
-
 /*eslint-env browser, parsedInput */
 /*eslint no-var: "error"*/
 /*eslint prefer-const: "error"*/
@@ -16,15 +15,18 @@ document.addEventListener("DOMContentLoaded", (event) => {
             window.performance.clearMarks();
         })
         .finally(() => {
-           enableButtons();
+            enableButtons();
         });
 });
 //btnScrape.addEventListener("click", StartScrap);
 aboutbtn.addEventListener("click", displayScreen.bind(this, "about"));
 homebtn.addEventListener("click", displayScreen.bind(this, "home"));
 mobileNav.addEventListener("click", toggleSideBar.bind(this));
-nextChapterLink.addEventListener("click", changeToNextChapter.bind(this));
-previousChapterLink.addEventListener("click", changeToPreviousChapter.bind(this));
+
+nextChapterLink[0].addEventListener("click", changeToNextChapter.bind(this));
+previousChapterLink[0].addEventListener("click", changeToPreviousChapter.bind(this));
+nextChapterLink[1].addEventListener("click", changeToNextChapter.bind(this));
+previousChapterLink[1].addEventListener("click", changeToPreviousChapter.bind(this));
 
 inputScrape.addEventListener("focus", (e) => {
     this.value = "";
@@ -41,14 +43,14 @@ btnScrape.addEventListener("click",
             .then(upsertAllChaptersFromArray)
             .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
             .then(updateSideBarMenu) //TODO: not necessary to list and update again
-            //.then(populateDropDownMenu) 
+            .then(populateSelectOptions)
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance)
-        .finally(() => {
-            enableButtons();
-        });;
+            .then(reportPerformance)
+            .finally(() => {
+                enableButtons();
+            });;
     });
 btnScrapeAndDrive.addEventListener("click",
     () => {
@@ -59,19 +61,19 @@ btnScrapeAndDrive.addEventListener("click",
             .then(getAllChapters)
             .then(upsertAllChaptersFromArray)
             .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
-            .then(updateSideBarMenu)    //TODO: not necessary to list and update again
+            .then(updateSideBarMenu) //TODO: not necessary to list and update again
             .then(StartGoogleDrive)
             .then(forceAuthGoogleDrive)
             .then(createAppFolderAsync)
             .then(storyUploadProcess)
-            //.then(populateDropDownMenu) 
+            .then(populateSelectOptions)
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance)
-        .finally(() => {
-            enableButtons();
-        });;
+            .then(reportPerformance)
+            .finally(() => {
+                enableButtons();
+            });
     });
 
 btnRestore.addEventListener("click",
@@ -83,10 +85,10 @@ btnRestore.addEventListener("click",
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
-        .then(reportPerformance)
-        .finally(() => {
-            enableButtons();
-        });;
+            .then(reportPerformance)
+            .finally(() => {
+                enableButtons();
+            });;
     });
 
 const deleteStoryProcess = (storyId) => {

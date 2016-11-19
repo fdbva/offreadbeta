@@ -168,6 +168,7 @@ function uploadStory(storyObject, appFolderGoogleId) {
         console.log("estimated file size (length*1.5): ", deflatedObj.length*1.5);
         console.log("estimated file size without compression (length*1): ", jsonObj.length);
         window.performance.mark('endPakoDeflateStory');
+
         const multipartRequestBody =
             delimiter +
                 "Content-Type: application/json\r\n\r\n" +
@@ -219,7 +220,7 @@ function deleteStoryGd() {
             });
         request.execute((resp) => {
             const files = resp.items;
-            console.log(resp);                
+            console.log(resp);
             deleteFileById(files[0].id)
             .then((resp)=>{resolve();});
         });
@@ -255,7 +256,7 @@ function downloadFiles(files) {
     });
     return promise;
 };
-    
+
 //function downloadFile(file) {
 //    const promise = new Promise((resolve, reject) => {
 //        if (file.downloadUrl) {

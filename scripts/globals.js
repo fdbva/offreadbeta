@@ -4,6 +4,7 @@
 /*eslint-env es6*/
 
 const that = this;
+
 that.batchRequestDelay = 3000;
 that.scrape = {
     parsedInput: {
@@ -41,6 +42,7 @@ that.chapterObject = {
     storyContent: null
 };
 that.retryCount = [];
+
 const maxRetryInterval = 8000;
 const maxRequestRetry = 5;
 that.chaptersArray = [];
@@ -55,12 +57,15 @@ const btnScrapeAndDrive = document.querySelector("#btn-scrape-drive");
 const btnRestore = document.querySelector("#btn-restore");
 const inputScrape = document.querySelector("#input-scrape");
 const resultsAnchor = document.querySelector("#resultsAnchor");
-const nextChapterLink = document.querySelector(".next");
-const previousChapterLink = document.querySelector(".prev");
+
+const nextChapterLink = document.querySelectorAll(".next");
+const previousChapterLink = document.querySelectorAll(".prev");
+const chaptersSelect = document.querySelectorAll("#chapters-select");
+
 const chaptersTotal = document.querySelector("#chapters-total");
-const chaptersSelect = document.querySelector("#chapters-select");
 const mobileNav = document.querySelector("#mobile-nav");
 const homebtn = document.querySelector(".home-btn");
+
 const aboutbtn = document.querySelector(".about-btn");
 
 //IndexedDb
@@ -78,6 +83,7 @@ let globalAppFolderGoogleId = null;
 let globalStoryFolderGoogleId = null;
 let globalDeleteStoryId = null;
 let idStory = undefined;
+
 let storyName = undefined;
 that.driveItems = [];
 
@@ -132,6 +138,7 @@ const reportPerformance = function () {
     });
     return promise;
 };
+
 function makeRequestWithRetry2(otherArgs, retryInterval, maxRetries, promise) { //TODO: consertar!
     const promiseBase = new Promise((resolve, reject) => {
         promise = promise || new Promise((r) => {resolve(r)}, (e)=>{reject(e)});

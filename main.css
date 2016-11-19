@@ -91,12 +91,10 @@ body {
 }
 
 .nav {
-    position: fixed;
     bottom: 0;
-    margin-bottom: 20px;
     color: #555;
     z-index: 99;
-    width: 320px;
+    width: 100%;
     text-align: center;
     display: flex;
     justify-content: center;
@@ -109,6 +107,7 @@ body {
 .nav div:first-child {
     border-right: 1px solid #333;
     padding-right: 10px;
+    margin-left: 0px;
 }
 
 .reader .navigation {
@@ -199,6 +198,12 @@ body {
     color: #FFF;
 }
 
+/*.sidebar-list--item::before {
+    content: 'aa';
+    width: 10px;
+    height: 10px;
+}*/
+
 .sidebar-list--text {
     display: block;
     pointer-events: none;
@@ -213,6 +218,11 @@ body {
     overflow-wrap: normal;
     text-overflow: ellipsis;
     cursor: pointer;
+}
+
+.footer {
+    border-top: 1px dotted #999;
+    padding: 20px 0 30px 0;
 }
 
 @media only screen and (max-width: 600px) {
@@ -232,6 +242,10 @@ body {
     justify-content: center;
     flex-wrap: wrap;
     padding: 10px;
+}
+
+.sidebar-input p {
+    display: flex;
 }
 
 .sidebar-input #input-scrape {

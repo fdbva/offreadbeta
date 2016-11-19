@@ -15,8 +15,12 @@ function displayScreen(currentDisplay) {
         about.style.display = "block";
     else if (currentDisplay === "home")
         home.style.display = "block";
-    else
+    else {
         offreader.style.display = "block";
+        setTimeout(function(){
+            getCurrentChapter();
+        }, 1000);
+    }
 }
 
 function disableButtons() {
@@ -47,35 +51,37 @@ function toggleSideBar() {
     sidebar.style.display = style.display === "none" ? "block" : "none";
 }
 
-function populateChaptersSelectOptions() {
-    const chaptersSelect = document.querySelector("#chapters-select");
-    chaptersSelect.innerHTML = "";
-    const optionHtml = document.createDocumentFragment();
-    for (let i = 1; i <= Story.chapters; i++) {
-        optionHtml.appendChild(new Option(`Chapter: ${i}`, i));
-    }
-    chaptersSelect.appendChild(optionHtml);
-    chaptersSelect.addEventListener("change", function () {
-        goToChapter(this.value); //RAPHAEL, quando vc faz isso, vc passa uma string, e depois vc tenta somar como se fosse número
-    });
-}
+function populateSelectOptions() {
+    const promise = new Promise(function (resolve, reject) {
+        const select = document.querySelectorAll(".chapters-select");
 
-const populateDropDownMenu = (data) => {
-    const promise = new Promise((resolve, reject) => {
-        console.log("populateDropDownMenu, data:", data);
-        for (let i = 1; i <= that.scrape.totalOfChapters; i++) {
-            const opt = document.createElement("option");
-            opt.value = i;
-            opt.innerHTML = "Chapter: " + i;
-            chaptersSelect.appendChild(opt);
-        };
-        chaptersSelect.addEventListener("change", () => {
+        select[0].innerHTML = "";
+        select[1].innerHTML = "";
+
+        const optionHtml = document.createDocumentFragment(),
+            optionHtml2 = document.createDocumentFragment();
+        for (let i = 1; i <= Story.chapters; i++) {
+            optionHtml.appendChild(new Option(`Chapter: ${i}`, i));
+            optionHtml2.appendChild(new Option(`Chapter: ${i}`, i));
+        }
+
+        select[0].appendChild(optionHtml);
+        select[1].appendChild(optionHtml2);
+
+        function changeFn(e) {
+            console.log(this.value);
             goToChapter(this.value);
-        });
-        resolve();
+            e.preventDefault();
+            window.scrollTo(0, 0);
+        };
+
+        select[0].addEventListener("change", changeFn)
+        select[1].addEventListener("change", changeFn)
+
+        resolve()
     });
     return promise;
-};
+}
 
 function closeMobileSidebar() {
     const sidebar = document.querySelector(".sidebar");
@@ -126,32 +132,39 @@ function changeToPreviousChapter(e) {
     e.preventDefault();
 }
 
+
 function updateNav() {
-    const chaptersSelect = document.querySelector("#chapters-select");
-    chaptersSelect.selectedIndex = Story.currentChapter - 1;
+    const chaptersSelect = document.querySelectorAll(".chapters-select");
+    chaptersSelect[0].selectedIndex = Story.currentChapter - 1;
+    chaptersSelect[1].selectedIndex = Story.currentChapter - 1;
+
     if (Story.currentChapter > 1) {
-        previousChapterLink.classList.remove("disable");
+        previousChapterLink[0].classList.remove("disable");
+        previousChapterLink[1].classList.remove("disable");
 
         if (Story.currentChapter == Story.chapters) {
-            nextChapterLink.classList.add("disable");
+            nextChapterLink[0].classList.add("disable");
+            nextChapterLink[1].classList.add("disable");
         } else {
-            nextChapterLink.classList.remove("disable");
+            nextChapterLink[0].classList.remove("disable");
+            nextChapterLink[1].classList.remove("disable");
         }
     } else if (Story.currentChapter === 1) {
-        previousChapterLink.classList.add("disable");
+        previousChapterLink[0].classList.add("disable");
+        previousChapterLink[1].classList.add("disable");
         if (Story.chapters > 1) {
-            nextChapterLink.classList.remove("disable");
+            nextChapterLink[0].classList.remove("disable");
+            nextChapterLink[1].classList.remove("disable");
         }
     }
 }
 
 function updateSideBarMenu() {
     const promise = new Promise((resolve, reject) => {
-        window.performance.mark('startUpdateSideBarMenu');
-        const data = that.sidebarMenu;
+        var data = that.sidebarMenu;
         const strList = document.querySelector(".sidebar-list");
         strList.innerHTML = "";
-        data.forEach((obj, i) => {
+        data.forEach(function(obj, i) {
             strList.insertAdjacentHTML("beforeend",
                 `
         <a href="#" class="sidebar-list--item story-sel" data-story="${i}" title="${obj.storyName}">
@@ -177,7 +190,7 @@ function updateSideBarMenu() {
                     closeMobileSidebar();
                     getCurrentChapter();
                     updateNav();
-                    populateChaptersSelectOptions();
+                    populateSelectOptions();
                     displayScreen();
                 });
         };

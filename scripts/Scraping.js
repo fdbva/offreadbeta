@@ -21,7 +21,10 @@ function ScrapeButtonStarter() {
         title.textContent = that.scrape.parsedInput.storyName;
         console.log("StartScrapingAsync resolve");
         console.groupEnd("ScrapeButtonStarter");
-        resolve({ method: "GET", url: that.scrape.yqlGetChapterLinks });
+        resolve({
+            method: "GET",
+            url: that.scrape.yqlGetChapterLinks
+        });
     });
     return promise;
 };
@@ -38,9 +41,9 @@ const parseStoryInfo = (response) => {
     window.performance.mark('endGetStoryInfo');
     window.performance.mark('startParseStoryInfo');
     const promise = new Promise((resolve, reject) => {
-        console.log("parseStoryInfo response: ",response);
-        console.log("parseStoryInfo resolve: ",resolve);
-        console.log("parseStoryInfo reject: ",reject);
+        console.log("parseStoryInfo response: ", response);
+        console.log("parseStoryInfo resolve: ", resolve);
+        console.log("parseStoryInfo reject: ", reject);
         const totalOfChapters = (JSON.parse(response)).query.results.select[0].option.length;
         if (totalOfChapters <= 0) {
             reject();
@@ -74,7 +77,10 @@ const buildChapterPromises = () => {
                 that.scrape.parsedInput.hrefEmptyChapter + i,
                 that.scrape.parsedInput.xpathStory,
                 "xml");
-            that.scrape.chapterLinksList.push({ method: "GET", url: yqlGetChapter });
+            that.scrape.chapterLinksList.push({
+                method: "GET",
+                url: yqlGetChapter
+            });
         };
         console.log("buildChapterPromises, that.scrape.chapterLinksList", that.scrape.chapterLinksList);
         if (!that.scrape || !that.scrape.chapterLinksList || that.scrape.chapterLinksList.length <= 0) {
@@ -93,28 +99,32 @@ const getAllChapters = (data) => {
         const k = that.scrape.chapterLinksList.length;
         let j = 0;
         return Promise.map(that.scrape.chapterLinksList, (response, i) => {
-            return makeRequestWithRetry(that.scrape.chapterLinksList[i], 8, 10)
-                .then((response) => {
-                    const storyObj = {
-                        chapterId: that.scrape.parsedInput.storyId + "." + (i + 1),
-                        storyId: that.scrape.parsedInput.storyId,
-                        chapterNumber: i+1,
-                        storyName: that.scrape.parsedInput.storyName,
-                        totalOfChapters: that.scrape.totalOfChapters,
-                        chapterUrl: that.scrape.parsedInput.hrefEmptyChapter + `/${i + 1}`,
-                        author: "",
-                        storyContent: response
-                    };
-                    console.log(`requests done: ${++j}/${k}`);
-                    that.chaptersArray.push(storyObj);
-                }).catch((reason)=> { console.log(reason); });
-        })
+                return makeRequestWithRetry(that.scrape.chapterLinksList[i], 8, 10)
+                    .then((response) => {
+                        const storyObj = {
+                            chapterId: that.scrape.parsedInput.storyId + "." + (i + 1),
+                            storyId: that.scrape.parsedInput.storyId,
+                            chapterNumber: i + 1,
+                            storyName: that.scrape.parsedInput.storyName,
+                            totalOfChapters: that.scrape.totalOfChapters,
+                            chapterUrl: that.scrape.parsedInput.hrefEmptyChapter + `/${i + 1}`,
+                            author: "",
+                            storyContent: response
+                        };
+                        console.log(`requests done: ${++j}/${k}`);
+                        that.chaptersArray.push(storyObj);
+                    }).catch((reason) => {
+                        console.log(reason);
+                    });
+            })
             .then((resp) => {
                 window.performance.mark('endGetAllChapters');
                 console.groupEnd("getAllChapters");
                 resolve(data);
             })
-        .catch((reason)=> { console.log(reason); });
+            .catch((reason) => {
+                console.log(reason);
+            });
     });
     return promise;
 };
@@ -169,7 +179,7 @@ function parseUserInput(url, supSites) {
                   xpathStory: ${input.xpathStory}`);
         return;
     }
-    console.log(`Site ${input.name} successfully detected`, input);//JSON.stringify(input, undefined, 2));
+    console.log(`Site ${input.name} successfully detected`, input); //JSON.stringify(input, undefined, 2));
     return input;
 };
 
@@ -184,28 +194,28 @@ function yqlStringBuilder(parsedUrl, xpath, format = "json") {
     return yql;
 };
 
-    /*** Deprecated ***/
+/*** Deprecated ***/
 
-    const getFirstChapter = (data) => {
-        const promise = new Promise((resolve, reject) => {
-            console.log("getFirstChapter beforebegin, link: ", that.scrape.chapterLinksList[0]);
-            return makeRequestWithRetry(that.scrape.chapterLinksList[0], 8, 10)
-                .then((response) => {
-                    console.log("getFirstChapter makerequest.then, response: ", response != null);
-                    storyObj = {
-                        chapterId: that.scrape.parsedInput.storyId + ".1",
-                        storyId: that.scrape.parsedInput.storyId,
-                        chapterNumber: 1,
-                        storyName: that.scrape.parsedInput.storyName,
-                        totalOfChapters: that.scrape.totalOfChapters,
-                        chapterUrl: that.scrape.parsedInput.hrefEmptyChapter + "/1",
-                        author: "",
-                        storyContent: response
-                    };
-                    that.chaptersArray.push(storyObj);
-                    delete that.scrape.chapterLinksList[0];
-                    resolve(data);
-                });
-        });
-        return promise;
-    };
+const getFirstChapter = (data) => {
+    const promise = new Promise((resolve, reject) => {
+        console.log("getFirstChapter beforebegin, link: ", that.scrape.chapterLinksList[0]);
+        return makeRequestWithRetry(that.scrape.chapterLinksList[0], 8, 10)
+            .then((response) => {
+                console.log("getFirstChapter makerequest.then, response: ", response != null);
+                storyObj = {
+                    chapterId: that.scrape.parsedInput.storyId + ".1",
+                    storyId: that.scrape.parsedInput.storyId,
+                    chapterNumber: 1,
+                    storyName: that.scrape.parsedInput.storyName,
+                    totalOfChapters: that.scrape.totalOfChapters,
+                    chapterUrl: that.scrape.parsedInput.hrefEmptyChapter + "/1",
+                    author: "",
+                    storyContent: response
+                };
+                that.chaptersArray.push(storyObj);
+                delete that.scrape.chapterLinksList[0];
+                resolve(data);
+            });
+    });
+    return promise;
+};
