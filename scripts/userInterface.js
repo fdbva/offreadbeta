@@ -179,33 +179,35 @@ function updateSideBarMenu() {
 
         const storySelector = document.querySelectorAll(".story-sel");
         for (let i = storySelector.length - 1; i >= 0; i--) {
-            storySelector[i].addEventListener("click", function(e) {
-                    console.log(this.parentElement);
-                    var chapterDelete = this.parentElement.children[0];
-                    chapterDelete.addEventListener("click", function(e) {
-                        var storyId = data[e.target.dataset.story].storyId;
-                        console.log('deleting', storyId)
-                        deleteStoryProcess(storyId);
-                        chapterDelete.parentElement.style.display = 'none';
-                        displayScreen("home");
-                        enableButtons();
-                    })
-                    console.log(this.dataset.story);
-                    const s = this.dataset.story;
-                    console.log(data[s]);
-                    Story.name = data[s].storyName;
-                    Story.id = data[s].chapterId.split(".")[0];
-                    Story.chapters = data[s].totalOfChapters;
-                    chaptersTotal.textContent = Story.chapters;
-                    title.textContent = Story.name;
-                    Story.currentChapter = 1;
+            // delete item
+            var chapterDelete = storySelector[i].parentElement.children[0];
+            chapterDelete.addEventListener("click", function(e) {
+                var storyId = data[e.target.dataset.story].storyId;
+                console.log('deleting', storyId)
+                deleteStoryProcess(storyId);
+                chapterDelete.parentElement.style.display = 'none';
+                displayScreen("home");
+                enableButtons();
+            })
 
-                    closeMobileSidebar();
-                    getCurrentChapter();
-                    updateNav();
-                    populateSelectOptions();
-                    displayScreen();
-                });
+            // story item
+            storySelector[i].addEventListener("click", function(e) {
+                console.log(this.dataset.story);
+                const s = this.dataset.story;
+                console.log(data[s]);
+                Story.name = data[s].storyName;
+                Story.id = data[s].chapterId.split(".")[0];
+                Story.chapters = data[s].totalOfChapters;
+                chaptersTotal.textContent = Story.chapters;
+                title.textContent = Story.name;
+                Story.currentChapter = 1;
+
+                closeMobileSidebar();
+                getCurrentChapter();
+                updateNav();
+                populateSelectOptions();
+                displayScreen();
+            });
         };
         window.performance.mark('endUpdateSideBarMenu');
         resolve();
