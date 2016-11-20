@@ -47,9 +47,20 @@ function toggleSideBar() {
     const sidebar = document.querySelector(".sidebar");
     const navToggle = document.querySelector(".nav-toggle");
 
+    const reader = document.querySelector(".reader");
+
     navToggle.classList.toggle("active");
     const style = window.getComputedStyle(sidebar);
-    sidebar.style.display = style.display === "none" ? "block" : "none";
+
+    var sidebarDisplay = (style.display === "none");
+    if (sidebarDisplay) {
+        sidebar.style.display = "block";
+        reader.style.display = "none";
+    } else {
+        sidebar.style.display = "none";
+        reader.style.display = "block";
+    }
+
 }
 
 function populateSelectOptions() {
@@ -192,6 +203,9 @@ function updateSideBarMenu() {
 
             // story item
             storySelector[i].addEventListener("click", function(e) {
+                const reader = document.querySelector(".reader");
+                reader.style.display = "block";
+
                 console.log(this.dataset.story);
                 const s = this.dataset.story;
                 console.log(data[s]);
