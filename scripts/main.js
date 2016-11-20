@@ -101,5 +101,4 @@ const deleteStoryProcess = (storyId) => {
         .catch((reason) => {
             console.log("inside catch, reason: ", reason);
         });
-
 };

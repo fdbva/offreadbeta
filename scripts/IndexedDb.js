@@ -235,6 +235,7 @@ const deleteStoryDb = (storyId) => {
         let store;
         const storeStoryIdKeyPath = getObjectStore(DB_STORE_NAME, "readwrite").index("storyId");
         let chapterKeys = 0;
+
         storeStoryIdKeyPath.getAllKeys(storyId).onsuccess = (evt) => {
             if (typeof evt.target.result == "undefined") {
                 console.error("No matching record found");
@@ -243,10 +244,13 @@ const deleteStoryDb = (storyId) => {
             console.log(evt);
             chapterKeys = evt.target.result;
             store = getObjectStore(DB_STORE_NAME, "readwrite");
+            console.log(store)
+            store.oncomplete = function() {
+                resolve();
+            }
             deleteNext();
         }
         let i = 0;
-
         function deleteNext(evt) {
             console.log("deleteNext evt: ", evt);
             if (i < chapterKeys.length) {

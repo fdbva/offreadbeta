@@ -148,10 +148,6 @@ body {
     height: 70%;
     overflow: hidden;
 }
-.sidebar-list--item, .sidebar-list--item:hover {
-    color: inherit;
-    text-decoration: none;
-}
 .sidebar-list--item {
     display: block;
     position: relative;
@@ -160,7 +156,6 @@ body {
     padding: .8em;
     margin-top: .4rem;
     font-size: .875rem;
-    cursor: default;
     background: rgba(0, 0, 0, .1);
     box-shadow: inset -1px 0 #e3e3e3;
     color: #333;
@@ -176,6 +171,7 @@ body {
 .sidebar-list--delete-item {
     position: absolute;
     left: 7px;
+    cursor: pointer;
     content: '';
     display: block;
     box-sizing: border-box;
@@ -188,7 +184,7 @@ body {
     border-radius: 100%;
     background: -webkit-linear-gradient(-45deg, transparent 0%, transparent 46%, white 46%, white 56%, transparent 56%, transparent 100%), -webkit-linear-gradient(45deg, transparent 0%, transparent 46%, white 46%, white 56%, transparent 56%, transparent 100%);
     background-color: #9d9d9d;
-    opacity: .3;
+    opacity: .7;
     transition: all 300ms ease;
 }
 .sidebar-list:hover .sidebar-list--delete-item {
@@ -197,18 +193,20 @@ body {
 
 .sidebar-list--text {
     display: block;
-    pointer-events: none;
+    color: #333;
     text-decoration: none;
     margin-left: 13px;
-}
-
-.sidebar-list--item, .sidebar-list--text {
-    /*overflow: hidden;*/
     white-space: nowrap;
     word-wrap: normal;
     overflow-wrap: normal;
     text-overflow: ellipsis;
     cursor: pointer;
+    z-index: 99;
+    position: relative;
+}
+.sidebar-list--text, .sidebar-list--text:hover {
+    color: inherit;
+    text-decoration: none;
 }
 
 .footer {

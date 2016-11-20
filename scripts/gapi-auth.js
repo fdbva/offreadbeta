@@ -9,20 +9,21 @@ const StartGoogleDrive = () => {
         console.groupCollapsed("Google Drive");
         console.log("StartGoogleDrive");
         window.performance.mark('startStartGoogleDriveToCreateAppFolder');
-        const script = document.createElement('script');
-        let loaded;
-        script.setAttribute('src', "https://apis.google.com/js/client.js");
-
-        script.onreadystatechange = script.onload = () => {
-            if (!loaded) {
-                setTimeout(() => { resolve(); }, 600);
-            };
-            loaded = true;
-        };
-        document.getElementsByTagName('head')[0].appendChild(script);
+        return loadInitialGoogleScript();
     });
     return promise;
 };
+function loadInitialGoogleScript() {
+    return new Promise(function(resolve, reject) {
+        const head = document.getElementsByTagName('head')[0];
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = "https://apis.google.com/js/client.js";
+        script.onreadystatechange = script.onload = resolve;
+        script.onload = reject;
+        head.appendChild(script);
+    });
+}
 
 function checkAuthGoogleDrive() {
     return new Promise((resolve, reject) => {
@@ -40,7 +41,8 @@ function checkAuthGoogleDrive() {
     });
 };
 
-function forceAuthGoogleDrive() {
+function forceAuthGoogleDrive(data) {
+    console.log(gapi);
     return new Promise((resolve, reject) => {
         authGoogleDriveRequest(true)
             .then((response) => {

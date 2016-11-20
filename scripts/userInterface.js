@@ -163,26 +163,32 @@ function updateNav() {
 function updateSideBarMenu() {
     const promise = new Promise((resolve, reject) => {
         var data = that.sidebarMenu;
+        console.log(data);
         const strList = document.querySelector(".sidebar-list");
         strList.innerHTML = "";
         data.forEach(function(obj, i) {
             strList.insertAdjacentHTML("beforeend",
                 `
-        <a href="#" class="sidebar-list--item story-sel" data-story="${i}" title="${obj.storyName}">
+        <div class="sidebar-list--item">
             <div class="sidebar-list--delete-item" data-story="${i}"></div>
-            <span class="sidebar-list--text">${obj.storyName} - ${obj.totalOfChapters} chapters</span>
-        </a>`);
+            <a href="#" class="sidebar-list--text story-sel" data-story="${i}" title="${obj.storyName}">
+                ${obj.storyName} - ${obj.totalOfChapters} chapters
+            </a>
+        </div>`);
         });
 
         const storySelector = document.querySelectorAll(".story-sel");
         for (let i = storySelector.length - 1; i >= 0; i--) {
             storySelector[i].addEventListener("click", function(e) {
-                    console.log(this);
-                    var chapterDelete = this.children[0];
+                    console.log(this.parentElement);
+                    var chapterDelete = this.parentElement.children[0];
                     chapterDelete.addEventListener("click", function(e) {
                         var storyId = data[e.target.dataset.story].storyId;
                         console.log('deleting', storyId)
                         deleteStoryProcess(storyId);
+                        chapterDelete.parentElement.style.display = 'none';
+                        displayScreen("home");
+                        enableButtons();
                     })
                     console.log(this.dataset.story);
                     const s = this.dataset.story;
