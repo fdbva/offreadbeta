@@ -9,7 +9,7 @@ const StartGoogleDrive = () => {
         console.groupCollapsed("Google Drive");
         console.log("StartGoogleDrive");
         window.performance.mark('startStartGoogleDriveToCreateAppFolder');
-        return loadInitialGoogleScript();
+        loadInitialGoogleScript().then(()=>resolve());
     });
     return promise;
 };
@@ -19,8 +19,9 @@ function loadInitialGoogleScript() {
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = "https://apis.google.com/js/client.js";
-        script.onreadystatechange = script.onload = resolve;
-        script.onload = reject;
+        script.onreadystatechange = script.onload = function() {
+            setTimeout(function() { resolve() }, 1000);
+        };
         head.appendChild(script);
     });
 }

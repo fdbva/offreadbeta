@@ -70,7 +70,7 @@ const aboutbtn = document.querySelector(".about-btn");
 
 //IndexedDb
 const DB_NAME = "offread";
-const DB_VERSION = 8;
+const DB_VERSION = 11;
 const DB_STORE_NAME = "stories";
 let db;
 

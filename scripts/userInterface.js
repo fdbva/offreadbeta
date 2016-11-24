@@ -1,4 +1,4 @@
-﻿/*eslint-env browser */
+/*eslint-env browser */
 /*eslint no-var: "error"*/
 /*eslint prefer-const: "error"*/
 /*eslint-env es6*/
@@ -174,7 +174,6 @@ function updateNav() {
 function updateSideBarMenu() {
     const promise = new Promise((resolve, reject) => {
         var data = that.sidebarMenu;
-        console.log(data);
         const strList = document.querySelector(".sidebar-list");
         strList.innerHTML = "";
         data.forEach(function(obj, i) {
