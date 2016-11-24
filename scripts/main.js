@@ -78,6 +78,7 @@ btnScrapeAndDrive.addEventListener("click",
 
 btnRestore.addEventListener("click",
     () => {
+        window.performance.mark("startWholeProcess");
         StartGoogleDrive()
             .then(forceAuthGoogleDrive)
             .then(createAppFolderAsync)
@@ -88,17 +89,24 @@ btnRestore.addEventListener("click",
             .then(reportPerformance)
             .finally(() => {
                 enableButtons();
-            });;
+            });
     });
 
 const deleteStoryProcess = (storyId) => {
+    window.performance.mark("startWholeProcess");
     console.log("enter deleteStoryProcess", storyId);
     globalDeleteStoryId = storyId;
-    deleteStoryDb(storyId);
-    StartGoogleDrive()
-        .then(checkAuthGoogleDrive)
-        .then(deleteStoryGd)
-        .catch((reason) => {
-            console.log("inside catch, reason: ", reason);
+    deleteStoryDb(storyId)
+        .then(() => {
+            StartGoogleDrive()
+                .then(checkAuthGoogleDrive)
+                .then(deleteStoryGd)
+                .catch((reason) => {
+                    console.log("inside catch, reason: ", reason);
+                })
+                .then(reportPerformance)
+                .finally(() => {
+                    enableButtons();
+                });
         });
 };

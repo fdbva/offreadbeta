@@ -1,4 +1,4 @@
-/*eslint-env browser */
+﻿/*eslint-env browser */
 /*eslint no-var: "error"*/
 /*eslint prefer-const: "error"*/
 /*eslint-env es6*/
@@ -191,14 +191,15 @@ function updateSideBarMenu() {
         for (let i = storySelector.length - 1; i >= 0; i--) {
             // delete item
             var chapterDelete = storySelector[i].parentElement.children[0];
-            chapterDelete.addEventListener("click", function(e) {
-                var storyId = data[e.target.dataset.story].storyId;
-                console.log('deleting', storyId)
-                deleteStoryProcess(storyId);
-                chapterDelete.parentElement.style.display = 'none';
-                displayScreen("home");
-                enableButtons();
-            })
+            chapterDelete.addEventListener("click",
+                function(e) {
+                    var storyId = data[e.target.dataset.story].storyId;
+                    console.log('deleting', storyId);
+                    deleteStoryProcess(storyId);
+                    this.parentElement.style.display = 'none';
+                    displayScreen("home");
+                    enableButtons();
+                });
 
             // story item
             storySelector[i].addEventListener("click", function(e) {

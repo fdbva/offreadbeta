@@ -20,7 +20,8 @@ function loadInitialGoogleScript() {
         script.type = 'text/javascript';
         script.src = "https://apis.google.com/js/client.js";
         script.onreadystatechange = script.onload = function() {
-            setTimeout(function() { resolve() }, 1000);
+            //setTimeout(function() { resolve() }, 3000);
+            resolve();
         };
         head.appendChild(script);
     });
@@ -28,14 +29,12 @@ function loadInitialGoogleScript() {
 
 function checkAuthGoogleDrive() {
     return new Promise((resolve, reject) => {
-        authGoogleDriveRequest(true)
+        authGoogleDriveRequest(true, false)
             .then((response) => {
                 if (response && !response.error) {
                     // Access token has been successfully retrieved, requests can be sent to the API.
-                    console.log("authResult success");
                     loadDriveApi().then((response) => { resolve(response) });
                 } else {
-                    console.log("break promise chain");
                     reject();
                 }
             });
@@ -45,13 +44,13 @@ function checkAuthGoogleDrive() {
 function forceAuthGoogleDrive(data) {
     console.log(gapi);
     return new Promise((resolve, reject) => {
-        authGoogleDriveRequest(true)
+        authGoogleDriveRequest(true, true)
             .then((response) => {
                 const authButton = document.getElementById("authorizeButton");
                 authButton.style.display = "none";
+                if (response === "loadGapiWait") resolve();
                 if (response && !response.error) {
                     // Access token has been successfully retrieved, requests can be sent to the API.
-                    console.log("authResult success");
                     authButton.style.display = "none";
                     loadDriveApi().then((response) => { resolve(response) });
                 } else {
@@ -59,29 +58,53 @@ function forceAuthGoogleDrive(data) {
                     console.log("authResult need authorization click");
                     authButton.style.display = "block";
                     authButton.onclick = () => {
-                        authGoogleDriveRequest(false);
+                        authGoogleDriveRequest(false, true);
                     };
                 };
             });
     });
 };
 
-function authGoogleDriveRequest(immediate) {
+function authGoogleDriveRequest(immediate, force) {
     return new Promise((resolve, reject) => {
-        gapi.auth.authorize(
+        //console.log("gapi: ", gapi);
+        //if (!gapi || !gapi.auth || !gapi.auth.authorize) {
+        //    setTimeout(function() {
+        //        if (force) {
+        //            forceAuthGoogleDrive();
+        //        } else {
+        //            checkAuthGoogleDrive();
+        //        }
+        //    },
+        //        200);
+        //}
+        try {
+            gapi.auth.authorize(
                 { 'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': immediate },
                 undefined)
             .then((response) => {
                 console.log("authGoogleDriveRequest");
                 resolve(response);
             });
+        } catch (e) {
+            console.log("gapiAuthorizeError: ",e);
+            setTimeout(function() {
+                if (force) {
+                    forceAuthGoogleDrive().then(() => { resolve("loadGapiWait") });
+                }
+                else {
+                    checkAuthGoogleDrive().then(() => { resolve("loadGapiWait") });
+                }
+            },
+                200);
+        } 
+        
     });
 };
 
 function loadDriveApi() {
     const promise = new Promise((resolve, reject) => {
         gapi.client.load("drive", "v2", undefined).then((response) => {
-            console.log("loadDriveApi");
             resolve(response);
         });
     });
@@ -92,7 +115,7 @@ function createAppFolderAsync(resp) {
     const promise = new Promise((resolve, reject) => {
         gapi.client.drive.files.list(
             {
-                'q': "mimeType = 'application/vnd.google-apps.folder' and title = 'OffWebReader' and trashed = false"
+                'q': "mimeType = 'application/vnd.google-apps.folder' and title = 'offread' and trashed = false"
             }).then((response) => {
                 console.log("createAppFolderAsync");//, response: ", response);
                 if (response.result.items.length === 0) {
@@ -111,7 +134,7 @@ function createAppFolderAsync(resp) {
 function createAppFolderAsyncHelper(resp) {
     const promise = new Promise((resolve, reject) => {
         const data = new Object();
-        data.title = "OffWebReader";
+        data.title = "offread";
         data.mimeType = "application/vnd.google-apps.folder";
         gapi.client.drive.files.insert({ 'resource': data }).execute((fileList) => {
             globalAppFolderGoogleId = fileList.id;
@@ -135,10 +158,10 @@ function storyUploadProcess(resp) {
                     deleteFileById(response.result.items[0].id)
                         .then((resp) => {
                             console.log("deleteFileById, resp", resp);
-                            resolve(uploadStory(that.chaptersArray, globalAppFolderGoogleId));
+                            uploadStory(that.chaptersArray, globalAppFolderGoogleId).then((resp) => {resolve(resp);});
                         });
                 } else {
-                    resolve(uploadStory(that.chaptersArray, globalAppFolderGoogleId));
+                    uploadStory(that.chaptersArray, globalAppFolderGoogleId).then((resp) => {resolve(resp);});
                 }
             });
     });
@@ -191,12 +214,14 @@ function uploadStory(storyObject, appFolderGoogleId) {
             },
             'body': multipartRequestBody
         });
-        request.execute((arg) => {
-            window.performance.mark('endUploadStory');
-            console.info(`File size reported by google: `, arg.fileSize);
-            console.info(`Story ${storyObject[0].storyName} uploaded to Google Drive. arg: `, arg);
-            console.groupEnd("Google Drive");
-            resolve();
+        Pace.track(function() {
+            request.execute((arg) => {
+                window.performance.mark('endUploadStory');
+                console.info(`File size reported by google: `, arg.fileSize);
+                console.info(`Story ${storyObject[0].storyName} uploaded to Google Drive. arg: `, arg);
+                console.groupEnd("Google Drive");
+                resolve();
+            });
         });
     });
     return promise;
@@ -225,7 +250,10 @@ function deleteStoryGd() {
             const files = resp.items;
             console.log(resp);
             deleteFileById(files[0].id)
-            .then((resp)=>{resolve();});
+            .then((resp) => {
+                console.groupEnd("Google Drive"); 
+                resolve();
+                });
         });
     });
     return promise;
@@ -241,7 +269,11 @@ function restoreFromGoogle() {
             console.log("restoreFromGoogle, id: ", globalAppFolderGoogleId);
             const files = resp.items;
             console.log("restoreFromGoogle, files: ", files);
-            resolve(downloadFiles(files));
+            if (files.length <= 0) {
+                console.groupEnd("Google Drive");
+                resolve();
+            }
+            downloadFiles(files).then((resp)=>resolve(resp));
         });
     });
     return promise;
@@ -253,8 +285,9 @@ function downloadFiles(files) {
         return files.map(function (response, i, [{concurrency: concurrency}])  {
             return makeRequestGoogleDrive(files[i].downloadUrl)
                 .then((response) => {
+                    upsertAllChaptersFromArray(that.chaptersArray).then(()=>resolve());
                     console.log("downloadFiles.then, response: ", response);
-                });
+            });
         });
     });
     return promise;
@@ -296,10 +329,11 @@ function makeRequestGoogleDrive(downloadUrl, retryCount = maxRequestRetry) {
         xhr.onload = function () {
             if (this.status >= 200 && this.status < 300) {
                 console.log(xhr);
+                console.groupEnd("Google Drive");
                 const appState = JSON.parse(pako.inflate(xhr.responseText, { to: 'string' }));
                 console.log(appState);
                 that.chaptersArray = appState;
-                upsertAllChaptersFromArray(appState);
+                resolve(appState);
             } else {
                 if (retryCount) {
                     setTimeout(makeRequest(data, --retryCount), 100);
@@ -328,110 +362,110 @@ function makeRequestGoogleDrive(downloadUrl, retryCount = maxRequestRetry) {
 
     /*** Deprecated ***/
 
-const uploadAllStoryChapters = (data) => {
-    const promise = new Promise((resolve, reject) => {
-        console.log("uploadAllStoryChapters, data", that.chaptersArray);
-        return that.chaptersArray.map((response, i) => {
-            return uploadChapter(that.chaptersArray[i], globalStoryFolderGoogleId)
-                .then((response) => {
-                    resolve();
+    const uploadAllStoryChapters = (data) => {
+        const promise = new Promise((resolve, reject) => {
+            console.log("uploadAllStoryChapters, data", that.chaptersArray);
+            return that.chaptersArray.map((response, i) => {
+                return uploadChapter(that.chaptersArray[i], globalStoryFolderGoogleId)
+                    .then((response) => {
+                        resolve();
+                    });
+            });
+        });
+        return promise;
+    };
+
+    function createStoryFolderAsyncHelper(resp) {
+        const promise = new Promise((resolve, reject) => {
+            const data = new Object();
+            data.title = that.scrape.parsedInput.storyId;
+            data.parents = [{ "id": globalAppFolderGoogleId }];
+            data.mimeType = "application/vnd.google-apps.folder";
+            gapi.client.drive.files.insert({ 'resource': data }).execute((fileList) => {
+                globalStoryFolderGoogleId = fileList.id;
+                console.log(`StoryFolder ${that.scrape.parsedInput.storyName} created`);
+                console.assert(fileList !== null, fileList);
+                resolve();
+            });
+        });
+        return promise;
+    };
+
+    function createStoryFolderAsync(resp) {
+        const promise = new Promise((resolve, reject) => {
+            gapi.client.drive.files.list(
+                {
+                    'q': "mimeType = 'application/vnd.google-apps.folder' and title = '" + that.scrape.parsedInput.storyId + "' and trashed = false"
+                }).then((response) => {
+                    console.log("createStoryFolderAsync", response);
+                    if (response.result.items.length !== 0) {
+                        deleteFileById(response.result.items[0].id)
+                            .then(() => {
+                                resolve(createStoryFolderAsyncHelper());
+                            });
+                    } else {
+                        resolve(createStoryFolderAsyncHelper());
+                    }
                 });
         });
-    });
-    return promise;
-};
+        return promise;
+    };
 
-function createStoryFolderAsyncHelper(resp) {
-    const promise = new Promise((resolve, reject) => {
-        const data = new Object();
-        data.title = that.scrape.parsedInput.storyId;
-        data.parents = [{ "id": globalAppFolderGoogleId }];
-        data.mimeType = "application/vnd.google-apps.folder";
-        gapi.client.drive.files.insert({ 'resource': data }).execute((fileList) => {
-            globalStoryFolderGoogleId = fileList.id;
-            console.log(`StoryFolder ${that.scrape.parsedInput.storyName} created`);
-            console.assert(fileList !== null, fileList);
-            resolve();
-        });
-    });
-    return promise;
-};
-
-function createStoryFolderAsync(resp) {
-    const promise = new Promise((resolve, reject) => {
-        gapi.client.drive.files.list(
-            {
-                'q': "mimeType = 'application/vnd.google-apps.folder' and title = '" + that.scrape.parsedInput.storyId + "' and trashed = false"
-            }).then((response) => {
-                console.log("createStoryFolderAsync", response);
-                if (response.result.items.length !== 0) {
-                    deleteFileById(response.result.items[0].id)
-                        .then(() => {
-                            resolve(createStoryFolderAsyncHelper());
-                        });
-                } else {
-                    resolve(createStoryFolderAsyncHelper());
-                }
-            });
-    });
-    return promise;
-};
-
-function uploadChapter(chapterObject, storyFolderGoogleId) {
-    const promise = new Promise((resolve, reject) => {
-        if (!chapterObject) {
-            console.log("uploadChapterHelper !chapterObject", chapterObject);
-        }
-        if (!storyFolderGoogleId) {
-            console.log("uploadChapterHelper !storyFolderGoogleId", storyFolderGoogleId);
-        }
-        const boundary = "-------314159265358979323846264";
-        const delimiter = "\r\n--" + boundary + "\r\n";
-        const close_delim = "\r\n--" + boundary + "--";
-        const contentType = "application/json";
-        const metadata = {
-            'title': chapterObject.chapterId,
-            'mimeType': contentType,
-            "parents": [{ "id": storyFolderGoogleId }]
-        };
-        const obj = (JSON.stringify(chapterObject));
-        const multipartRequestBody =
-            delimiter +
-                "Content-Type: application/json\r\n\r\n" +
-                JSON.stringify(metadata) +
+    function uploadChapter(chapterObject, storyFolderGoogleId) {
+        const promise = new Promise((resolve, reject) => {
+            if (!chapterObject) {
+                console.log("uploadChapterHelper !chapterObject", chapterObject);
+            }
+            if (!storyFolderGoogleId) {
+                console.log("uploadChapterHelper !storyFolderGoogleId", storyFolderGoogleId);
+            }
+            const boundary = "-------314159265358979323846264";
+            const delimiter = "\r\n--" + boundary + "\r\n";
+            const close_delim = "\r\n--" + boundary + "--";
+            const contentType = "application/json";
+            const metadata = {
+                'title': chapterObject.chapterId,
+                'mimeType': contentType,
+                "parents": [{ "id": storyFolderGoogleId }]
+            };
+            const obj = (JSON.stringify(chapterObject));
+            const multipartRequestBody =
                 delimiter +
-                "Content-Type: " +
-                contentType +
-                "\r\n\r\n" +
-                obj +
-                close_delim;
-        const request = gapi.client.request({
-            'path': "/upload/drive/v2/files",
-            'method': "POST",
-            'params': { 'uploadType': "multipart" },
-            'headers': {
-                'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
-            },
-            'body': multipartRequestBody
-        });
-        request.execute((arg) => {
-            console.info(`Chapter ${chapterObject.chapterId.split('.')[1]} from story ${chapterObject.storyName} uploaded to Google Drive`);
-            resolve();
-        });
-    });
-    return promise;
-};
-
-function uploadFile(evt) {
-    const promise = new Promise((resolve, reject) => {
-        gapi.client.load("drive",
-            "v2",
-            () => {
-                resolve();
-            },
-            () => {
-                reject();
+                    "Content-Type: application/json\r\n\r\n" +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    "Content-Type: " +
+                    contentType +
+                    "\r\n\r\n" +
+                    obj +
+                    close_delim;
+            const request = gapi.client.request({
+                'path': "/upload/drive/v2/files",
+                'method': "POST",
+                'params': { 'uploadType': "multipart" },
+                'headers': {
+                    'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
+                },
+                'body': multipartRequestBody
             });
-    });
-    return promise;
-};
+            request.execute((arg) => {
+                console.info(`Chapter ${chapterObject.chapterId.split('.')[1]} from story ${chapterObject.storyName} uploaded to Google Drive`);
+                resolve();
+            });
+        });
+        return promise;
+    };
+
+    function uploadFile(evt) {
+        const promise = new Promise((resolve, reject) => {
+            gapi.client.load("drive",
+                "v2",
+                () => {
+                    resolve();
+                },
+                () => {
+                    reject();
+                });
+        });
+        return promise;
+    };

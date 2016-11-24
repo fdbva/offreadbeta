@@ -173,6 +173,9 @@ const upsertAllChaptersFromArray = (objArray) => {
                 event.target.error ||
                 event.target.errorCode));
         };
+        db.oncomplete = (evt) => {
+            resolve(evt);
+        }
         const store = getObjectStore(DB_STORE_NAME, "readwrite");
         let i = 0;
         putNext();
@@ -248,7 +251,6 @@ const deleteStoryDb = (storyId) => {
         }
         let i = 0;
         function deleteNext(evt) {
-            console.log("deleteNext evt: ", evt);
             if (i < chapterKeys.length) {
                 store.delete(chapterKeys[i]).onsuccess = deleteNext;
                 ++i;
