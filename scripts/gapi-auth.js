@@ -44,59 +44,69 @@ function checkAuthGoogleDrive() {
 function forceAuthGoogleDrive(data) {
     console.log(gapi);
     return new Promise((resolve, reject) => {
-        authGoogleDriveRequest(true, true)
+        console.log("authGoogleDriveRequest before auth");
+        authGoogleDriveRequest(false, true)
             .then((response) => {
-                const authButton = document.getElementById("authorizeButton");
-                authButton.style.display = "none";
-                if (response === "loadGapiWait") resolve();
-                if (response && !response.error) {
-                    // Access token has been successfully retrieved, requests can be sent to the API.
-                    authButton.style.display = "none";
-                    loadDriveApi().then((response) => { resolve(response) });
-                } else {
-                    // No access token could be retrieved, show the button to start the authorization flow.
-                    console.log("authResult need authorization click");
-                    authButton.style.display = "block";
-                    authButton.onclick = () => {
-                        authGoogleDriveRequest(false, true);
-                    };
-                };
+                console.log("authGoogleDriveRequest INSIDE");
+                resolve(response);
+                //const authButton = document.getElementById("authorizeButton");
+                //authButton.style.display = "none";
+                //if (response === "loadGapiWait") resolve();
+                //if (response && !response.error) {
+                //    // Access token has been successfully retrieved, requests can be sent to the API.
+                //    authButton.style.display = "none";
+                //    loadDriveApi().then((response) => { resolve(response) });
+                //} else {
+                //    // No access token could be retrieved, show the button to start the authorization flow.
+                //    console.log("authResult need authorization click");
+                //    authButton.style.display = "block";
+                //    authButton.onclick = () => {
+                //        authGoogleDriveRequest(false, true);
+                //    };
+                //};
             });
     });
 };
 
 function authGoogleDriveRequest(immediate, force) {
     return new Promise((resolve, reject) => {
-        //console.log("gapi: ", gapi);
-        //if (!gapi || !gapi.auth || !gapi.auth.authorize) {
-        //    setTimeout(function() {
-        //        if (force) {
-        //            forceAuthGoogleDrive();
-        //        } else {
-        //            checkAuthGoogleDrive();
-        //        }
-        //    },
-        //        200);
-        //}
         try {
+            console.log("immediate: ", immediate);
+            console.log("CLIENT_ID: ", CLIENT_ID);
+            console.log("SCOPES: ", SCOPES);
             gapi.auth.authorize(
-                { 'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': immediate },
+                { 'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false },
                 undefined)
             .then((response) => {
-                console.log("authGoogleDriveRequest");
-                resolve(response);
+                console.log("gapi.auth.authorize .then()");
+                if (response && !response.error) {
+                    loadDriveApi().then((response) => { resolve(response) });
+                } 
+                //if (force) {
+                //    console.log("calling force: ");
+                //    forceAuthGoogleDrive().then((resp) => { 
+                //        console.log("loadGapiWait: ", resp);
+                //        resolve("loadGapiWait: ");
+                //    });
+                //}
+                //else {
+                //    console.log("calling check: ");
+                //    checkAuthGoogleDrive().then((resp) => { 
+                //        console.log("loadGapiWait: ", resp);
+                //        resolve("loadGapiWait: ");
+                //    });
+                //}
             });
+            console.log("not catch");
         } catch (e) {
             console.log("gapiAuthorizeError: ",e);
             setTimeout(function() {
-                if (force) {
-                    forceAuthGoogleDrive().then(() => { resolve("loadGapiWait") });
-                }
-                else {
-                    checkAuthGoogleDrive().then(() => { resolve("loadGapiWait") });
-                }
-            },
-                200);
+                console.log("calling self: ");
+                authGoogleDriveRequest(immediate, force).then((resp) => { 
+                    console.log("loadGapiWait: ", resp);
+                    resolve("loadGapiWait: ");
+                });},
+                400);
         } 
         
     });
@@ -113,20 +123,31 @@ function loadDriveApi() {
 
 function createAppFolderAsync(resp) {
     const promise = new Promise((resolve, reject) => {
-        gapi.client.drive.files.list(
-            {
-                'q': "mimeType = 'application/vnd.google-apps.folder' and title = 'offread' and trashed = false"
-            }).then((response) => {
-                console.log("createAppFolderAsync");//, response: ", response);
-                if (response.result.items.length === 0) {
-                    console.log("CRIAR");
-                    resolve(createAppFolderAsyncHelper());
-                } else {
-                    globalAppFolderGoogleId = response.result.items[0].id;
-                    window.performance.mark('endStartGoogleDriveToCreateAppFolder');
-                    resolve();
-                }
-            });
+        try {
+            gapi.client.drive.files.list(
+                {
+                    'q': "mimeType = 'application/vnd.google-apps.folder' and title = 'offread' and trashed = false"
+                }).then((response) => {
+                    console.log("createAppFolderAsync");//, response: ", response);
+                    if (response.result.items.length === 0) {
+                        console.log("CRIAR");
+                        resolve(createAppFolderAsyncHelper());
+                    } else {
+                        globalAppFolderGoogleId = response.result.items[0].id;
+                        window.performance.mark('endStartGoogleDriveToCreateAppFolder');
+                        resolve();
+                    }
+                });
+        } catch (e) {
+            console.log("gapiAuthorizeError: ",e);
+            setTimeout(function() {
+                console.log("calling self: ");
+                createAppFolderAsync(resp).then((resp) => { 
+                    console.log("createAppFolderAsync: ", resp);
+                    resolve(resp);
+                });},
+                400);
+        } 
     });
     return promise;
 };
