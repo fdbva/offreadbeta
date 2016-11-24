@@ -87,10 +87,10 @@ function populateSelectOptions() {
             window.scrollTo(0, 0);
         };
 
-        select[0].addEventListener("change", changeFn)
-        select[1].addEventListener("change", changeFn)
+        select[0].addEventListener("change", changeFn);
+        select[1].addEventListener("change", changeFn);
 
-        resolve()
+        resolve();
     });
     return promise;
 }
@@ -112,6 +112,7 @@ function goToChapter(chapter) {
 }
 
 function getCurrentChapter() {
+    window.scrollTo(0, 0);
     if (!Number.isInteger(Story.currentChapter)) {
         console.error("It's not a FUCKING NUMBER!");
     }

@@ -83,6 +83,8 @@ btnRestore.addEventListener("click",
             .then(forceAuthGoogleDrive)
             .then(createAppFolderAsync)
             .then(restoreFromGoogle)
+            .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
+            .then(updateSideBarMenu) //TODO: not necessary to list and update again
             .catch((reason) => {
                 console.log("inside catch, reason: ", reason);
             })
