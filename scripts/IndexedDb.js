@@ -26,12 +26,14 @@ function openDb() {
             const dbUpgrade = event.target.result;
             console.log(evt);
             console.log("openDb.onupgradeneeded");
-            const store = evt.currentTarget.result.createObjectStore(
-                DB_STORE_NAME,
-                { keyPath: "chapterId", autoIncrement: true });
+            if (evt.oldVersion === 0){
+                const store = evt.currentTarget.result.createObjectStore(
+                    DB_STORE_NAME,
+                    { keyPath: "chapterId", autoIncrement: true });
 
-            store.createIndex("chapterId", "chapterId", { unique: true });
-            store.createIndex("storyId", "storyId", { unique: false });
+                store.createIndex("chapterId", "chapterId", { unique: true });
+                store.createIndex("storyId", "storyId", { unique: false });
+            }
         };
     });
     return promise;
