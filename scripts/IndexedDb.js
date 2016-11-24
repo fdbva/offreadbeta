@@ -26,18 +26,17 @@ function openDb() {
             const dbUpgrade = event.target.result;
             console.log(evt);
             console.log("openDb.onupgradeneeded");
-            if (evt.oldVersion < evt.newVersion) {
-                //clearObjectStore();
+            if (evt.oldVersion === 0) {
+                const store = evt.currentTarget.result.createObjectStore(
+                    DB_STORE_NAME,
+                    { keyPath: "chapterId", autoIncrement: true });
+
+                store.createIndex("chapterId", "chapterId", { unique: true });
+                store.createIndex("storyId", "storyId", { unique: false });
+            }
+            else if (evt.oldVersion < evt.newVersion) {
                 dbUpgrade.deleteObjectStore(DB_STORE_NAME);
             }
-            //if (evt.oldVersion === 0) {
-            const store = evt.currentTarget.result.createObjectStore(
-                DB_STORE_NAME,
-                { keyPath: "chapterId", autoIncrement: true });
-
-            store.createIndex("chapterId", "chapterId", { unique: true });
-            store.createIndex("storyId", "storyId", { unique: false });
-            //}
         };
     });
     return promise;
