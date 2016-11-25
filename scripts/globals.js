@@ -69,6 +69,7 @@ const homebtn = document.querySelector(".home-btn");
 const aboutbtn = document.querySelector(".about-btn");
 const home = document.querySelector(".home");
 const about = document.querySelector(".about");
+const cssloader = document.querySelector(".cssload-loader");
 
 //IndexedDb
 const DB_NAME = "offread";
