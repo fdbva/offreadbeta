@@ -4,6 +4,9 @@
 /*eslint-env es6*/
 
 function displayScreen(currentDisplay) {
+    if (document.body.offsetWidth <= 600) 
+        toggleSideBar();
+
     const offreader = document.querySelector(".offreader");
     offreader.style.display = "none";
     home.style.display = "none";
