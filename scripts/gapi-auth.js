@@ -81,7 +81,9 @@ function authGoogleDriveRequest(immediate, force) {
                 if (response && !response.error) {
                     console.log("gapi.auth.authorize .then() in if");
                     loadDriveApi().then((response) => { resolve(response) });
-                } 
+                } else {
+                    resolve(response);
+                }
             });
             console.log("not catch");
         } catch (e) {
@@ -101,6 +103,7 @@ function authGoogleDriveRequest(immediate, force) {
 function loadDriveApi() {
     const promise = new Promise((resolve, reject) => {
         gapi.client.load("drive", "v2", undefined).then((response) => {
+            console.log("loadDriveApi");
             resolve(response);
         });
     });
@@ -252,6 +255,7 @@ function deleteStoryGd() {
             {
                 'q': "mimeType = 'application/json' and title = '" + globalDeleteStoryId + "' and trashed = false"
             });
+        console.log("deleteStoryGd pre-execute");
         request.execute((resp) => {
             const files = resp.items;
             console.log(resp);
