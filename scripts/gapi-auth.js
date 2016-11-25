@@ -8,7 +8,6 @@ const StartGoogleDrive = () => {
         disableButtons();
         console.groupCollapsed("Google Drive");
         console.log("StartGoogleDrive");
-        window.performance.mark('startStartGoogleDriveToCreateAppFolder');
         loadInitialGoogleScript().then(()=>resolve());
     });
     return promise;
@@ -80,22 +79,9 @@ function authGoogleDriveRequest(immediate, force) {
             .then((response) => {
                 console.log("gapi.auth.authorize .then()");
                 if (response && !response.error) {
+                    console.log("gapi.auth.authorize .then() in if");
                     loadDriveApi().then((response) => { resolve(response) });
                 } 
-                //if (force) {
-                //    console.log("calling force: ");
-                //    forceAuthGoogleDrive().then((resp) => { 
-                //        console.log("loadGapiWait: ", resp);
-                //        resolve("loadGapiWait: ");
-                //    });
-                //}
-                //else {
-                //    console.log("calling check: ");
-                //    checkAuthGoogleDrive().then((resp) => { 
-                //        console.log("loadGapiWait: ", resp);
-                //        resolve("loadGapiWait: ");
-                //    });
-                //}
             });
             console.log("not catch");
         } catch (e) {
@@ -123,6 +109,7 @@ function loadDriveApi() {
 
 function createAppFolderAsync(resp) {
     const promise = new Promise((resolve, reject) => {
+        window.performance.mark('startStartGoogleDriveToCreateAppFolder');
         try {
             gapi.client.drive.files.list(
                 {
