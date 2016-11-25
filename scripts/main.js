@@ -67,7 +67,7 @@ btnScrapeAndDrive.addEventListener("click",
             .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
             .then(updateSideBarMenu) //TODO: not necessary to list and update again
             .then(StartGoogleDrive)
-            .then(forceAuthGoogleDrive)
+            .then(authGoogleDriveRequest)
             .then(createAppFolderAsync)
             .then(storyUploadProcess)
             .then(populateSelectOptions)
@@ -86,7 +86,7 @@ btnRestore.addEventListener("click",
         cssloader.style.display = "block";
         window.performance.mark("startWholeProcess");
         StartGoogleDrive()
-            .then(forceAuthGoogleDrive)
+            .then(authGoogleDriveRequest)
             .then(createAppFolderAsync)
             .then(restoreFromGoogle)
             .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
@@ -109,8 +109,10 @@ const deleteStoryProcess = (storyId) => {
     deleteStoryDb(storyId)
         .then(() => {
             StartGoogleDrive()
-                .then(checkAuthGoogleDrive)
+                .then(authGoogleDriveRequest)
                 .then(deleteStoryGd)
+                .then(getListOfStoriesInDb) //TODO: only disable loader gif? still need to create/enable gif
+                .then(updateSideBarMenu) //TODO: not necessary to list and update again
                 .catch((reason) => {
                     console.log("inside catch, reason: ", reason);
                 })
