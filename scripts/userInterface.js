@@ -5,8 +5,6 @@
 
 function displayScreen(currentDisplay) {
     const offreader = document.querySelector(".offreader");
-    const home = document.querySelector(".home");
-    const about = document.querySelector(".about");
     offreader.style.display = "none";
     home.style.display = "none";
     about.style.display = "none";
