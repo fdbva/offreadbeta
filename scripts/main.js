@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         })
         .finally(() => {
             enableButtons();
+            cssloader.style.display = "none";
         });
 });
 //btnScrape.addEventListener("click", StartScrap);
@@ -35,6 +36,7 @@ inputScrape.addEventListener("focus", (e) => {
 //ScrapeButtonStarter();
 btnScrape.addEventListener("click",
     () => {
+        cssloader.style.display = "block";
         ScrapeButtonStarter()
             .then(getStoryInfo)
             .then(parseStoryInfo)
@@ -50,10 +52,12 @@ btnScrape.addEventListener("click",
             .then(reportPerformance)
             .finally(() => {
                 enableButtons();
+                cssloader.style.display = "none";
             });;
     });
 btnScrapeAndDrive.addEventListener("click",
     () => {
+        cssloader.style.display = "block";
         ScrapeButtonStarter()
             .then(getStoryInfo)
             .then(parseStoryInfo)
@@ -73,11 +77,13 @@ btnScrapeAndDrive.addEventListener("click",
             .then(reportPerformance)
             .finally(() => {
                 enableButtons();
+                cssloader.style.display = "none";
             });
     });
 
 btnRestore.addEventListener("click",
     () => {
+        cssloader.style.display = "block";
         window.performance.mark("startWholeProcess");
         StartGoogleDrive()
             .then(forceAuthGoogleDrive)
@@ -91,10 +97,12 @@ btnRestore.addEventListener("click",
             .then(reportPerformance)
             .finally(() => {
                 enableButtons();
+                cssloader.style.display = "none";
             });
     });
 
 const deleteStoryProcess = (storyId) => {
+    cssloader.style.display = "block";
     window.performance.mark("startWholeProcess");
     console.log("enter deleteStoryProcess", storyId);
     globalDeleteStoryId = storyId;
@@ -109,6 +117,7 @@ const deleteStoryProcess = (storyId) => {
                 .then(reportPerformance)
                 .finally(() => {
                     enableButtons();
+                    cssloader.style.display = "none";
                 });
         });
 };
