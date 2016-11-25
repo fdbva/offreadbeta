@@ -235,14 +235,12 @@ function uploadStory(storyObject, appFolderGoogleId) {
             },
             'body': multipartRequestBody
         });
-        Pace.track(function() {
-            request.execute((arg) => {
-                window.performance.mark('endUploadStory');
-                console.info(`File size reported by google: `, arg.fileSize);
-                console.info(`Story ${storyObject[0].storyName} uploaded to Google Drive. arg: `, arg);
-                console.groupEnd("Google Drive");
-                resolve();
-            });
+        request.execute((arg) => {
+            window.performance.mark('endUploadStory');
+            console.info(`File size reported by google: `, arg.fileSize);
+            console.info(`Story ${storyObject[0].storyName} uploaded to Google Drive. arg: `, arg);
+            console.groupEnd("Google Drive");
+            resolve();
         });
     });
     return promise;
