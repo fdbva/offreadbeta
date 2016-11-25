@@ -67,6 +67,8 @@ const mobileNav = document.querySelector("#mobile-nav");
 const homebtn = document.querySelector(".home-btn");
 
 const aboutbtn = document.querySelector(".about-btn");
+const home = document.querySelector(".home");
+const about = document.querySelector(".about");
 
 //IndexedDb
 const DB_NAME = "offread";
