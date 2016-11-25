@@ -32,9 +32,10 @@ function checkAuthGoogleDrive() {
             .then((response) => {
                 if (response && !response.error) {
                     // Access token has been successfully retrieved, requests can be sent to the API.
-                    loadDriveApi().then((response) => { resolve(response) });
+                    //loadDriveApi().then((response) => { resolve(response) });
+                    resolve(response);
                 } else {
-                    reject();
+                    reject("authGoogleDriveRequest else, reject");
                 }
             });
     });
@@ -251,6 +252,7 @@ function deleteFileById(fileId) {
 function deleteStoryGd() {
     console.log("enter deleteStoryGd", globalDeleteStoryId);
     const promise = new Promise((resolve, reject) => {
+        console.log("deleteStoryGd pre-files.list");
         const request = gapi.client.drive.files.list(
             {
                 'q': "mimeType = 'application/json' and title = '" + globalDeleteStoryId + "' and trashed = false"
