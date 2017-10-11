@@ -190,7 +190,7 @@ function yqlStringBuilder(parsedUrl, xpath, format = "json") {
                       xpath: ${xpath}`);
         return;
     }
-    const yql = "https://query.yahooapis.com/v1/public/yql?" + "q=" + encodeURIComponent(`select * from html where url=@url and xpath='${xpath}'`) + "&url=" + encodeURIComponent(parsedUrl) + `&crossProduct=optimized&format=${format}`;
+    const yql = "https://query.yahooapis.com/v1/public/yql?" + "q=" + encodeURIComponent(`select * from htmlstring where url=@url and xpath='${xpath}'`) + "&url=" + encodeURIComponent(parsedUrl) + `&crossProduct=optimized&format=${format}&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys`;
     return yql;
 };
 
